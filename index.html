@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      (function () {
+        var isExt = function (val) {
+          return (
+            typeof val === 'string' &&
+            (val.indexOf('chrome-extension://') !== -1 ||
+              val.indexOf('moz-extension://') !== -1 ||
+              val.indexOf('safari-extension://') !== -1 ||
+              val.indexOf('safari-web-extension://') !== -1)
+          );
+        };
+        window.addEventListener(
+          'error',
+          function (e) {
+            if (isExt(e.filename) || isExt(e.error && e.error.stack)) {
+              e.stopImmediatePropagation();
+              e.preventDefault();
+            }
+          },
+          true
+        );
+        window.addEventListener(
+          'unhandledrejection',
+          function (e) {
+            var stack = e.reason && e.reason.stack;
+            var msg = e.reason && e.reason.message;
+            if (isExt(stack) || isExt(msg)) {
+              e.stopImmediatePropagation();
+              e.preventDefault();
+            }
+          },
+          true
+        );
+        try {
+          var desc = Object.getOwnPropertyDescriptor(window, 'fetch');
+          if (desc && desc.configurable && typeof desc.get === 'function' && !desc.set) {
+            Object.defineProperty(window, 'fetch', {
+              get: desc.get,
+              set: function () {},
+              enumerable: desc.enumerable,
+              configurable: true,
+            });
+          }
+        } catch (_err) {
+          // Ignore if window.fetch descriptor cannot be updated
+        }
+      })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Stepwise — Guided Habit Builder & Tracker</title>
+    <meta
+      name="description"
+      content="Design tiny, identity-based habits step by step and track daily momentum offline."
+    />
+    <meta property="og:title" content="Stepwise — Guided Habit Builder & Tracker" />
+    <meta
+      property="og:description"
+      content="Design tiny, identity-based habits step by step and track daily momentum offline."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#0F766E" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Stepwise" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
